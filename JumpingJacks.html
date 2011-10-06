@@ -1,0 +1,142 @@
+<!DOCTYPE HTML> 
+<html>
+<head>
+<title>Jumping Jacks</title>
+<link rel="stylesheet" href="stick.css" type="text/css">
+<script src="kinetic2d-v1.0.2.js"></script>
+<script src="Body.js"></script>
+<script>
+/* Graphics */
+var canvas;
+var context;
+var kin;
+var bodies;
+
+/* Canvas Dimensions */
+var MIDX;
+var MIDY;
+
+/* Animation Control */
+var step = false;
+var delay = 2;
+
+
+window.onload = function ( )
+{	init();
+	
+	kin.setDrawStage( drawStage );
+	
+	kin.startAnimation();
+};
+
+function init( )
+{	/* Get Canvas */
+	canvas = document.getElementById( "stickScene" );
+	MIDX = ( canvas.width / 2 );
+	MIDY = ( canvas.height / 2 );
+	
+	context = canvas.getContext( "2d" );
+	
+	kin = new Kinetic_2d( canvas.id );
+	
+	/* Create Bodies */
+	bodies = new Array();
+	
+	/* Front Row */
+	bodies.push( new Body( -350, 0, 1, 10 ) );
+	bodies.push( new Body( -25, 0, 1, 20 ) );
+	bodies.push( new Body( 275, 0, 1, 30 ) );
+
+	/* Middle Row */
+	bodies.push( new Body( -250, -20, 0.7, 15 ) );
+	bodies.push( new Body( 50, -20, 0.7, 25 ) );
+	bodies.push( new Body( 350, -20, 0.7, 35 ) );
+
+	/* Back Row */
+	bodies.push( new Body( -175, -40, 0.5, 20 ) );
+	bodies.push( new Body( 125, -40, 0.5, 30 ) );
+	bodies.push( new Body( 400, -40, 0.5, 40 ) );
+}
+
+/* Draw the Scene */
+
+function drawStage ( )
+{	kin.clear();
+
+	context.save();
+	
+	/* Move to the center of the scene */
+	context.translate( MIDX, MIDY );
+	
+	var frame = ( kin.getFrame() / delay );
+	
+	/* Draw Ground Plane */
+	context.strokeStyle = "blue";
+	context.beginPath();
+	context.moveTo( -450, 93 );
+	context.lineTo( -250, -25 );
+	context.lineTo( 450, -25 );
+	context.lineTo( 350, 93 );
+	context.closePath();
+	context.stroke();
+	
+	/* Draw Bodies */
+	context.strokeStyle = "black";
+	for ( var j = 0 ; j < bodies.length ; j++ )
+		bodies[j].draw( frame, context );
+	
+	context.restore();
+
+	/* Step button was clicked */
+	if ( step )
+	{	kin.stopAnimation();
+		step = false;
+	}
+}
+</script>
+</head> 
+<body onmousedown="return false;">
+	<!-- Animation Control Buttons -->
+	<input type="button" value="Start" onclick="bStart();"/>
+	<input type="button" value="Stop" onclick="bStop();"/>
+	<input type="button" value="Step" onclick="bStep();"/>
+	<input type="button" value="Reset" onclick="bReset();"/>
+	<input type="button" value="Slower" onclick="bSlower();"/>
+	<input type="button" value="Faster" onclick="bFaster();"/>
+	<canvas id="stickScene" width="960" height="640"></canvas>
+<script>
+function bStart( )
+{	kin.startAnimation();
+}
+function bStop( )
+{	kin.stopAnimation();
+}
+function bStep( )
+{	step = true;
+	kin.startAnimation();
+}
+function bReset( )
+{	kin.stopAnimation();
+	kin.frame = 0;
+	drawStage();
+}
+function bSlower( )
+{	if ( delay >= 5 )
+		return;
+		
+	var old = delay;
+	delay++;
+	kin.frame = ( ( kin.frame / old ) * delay );
+}
+function bFaster( )
+{	if ( delay <= 1 )
+		return;
+		
+	var old = delay;
+	delay--;
+	kin.frame = ( ( kin.frame / old ) * delay );
+}
+</script>
+</body>
+</html>
+
